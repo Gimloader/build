@@ -9,5 +9,5 @@
         "skipLibCheck": true,
         "resolveJsonModule": true
     },
-    "include": ["./src/**.ts", "src/init/initold.js", "src/build/build.ts"]
+    "include": ["./src/**.ts"]
 }
