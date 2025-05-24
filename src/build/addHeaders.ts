@@ -24,19 +24,20 @@ export function createHeader(config: Config) {
         meta += '\n * @reloadRequired ingame';
     }
 
+    if(config.libs) {
+        for(let lib of config.libs) {
+            meta += `\n * @needsLib ${lib}`;
+        }
+    }
+
+    if(config.optionalLibs) {
+        for(let lib of config.optionalLibs) {
+            meta += `\n * @optionalLib ${lib}`;
+        }
+    }
+
     if(!config.isLibrary) {
         let pluginConfig = config as IPluginTypes;
-        if(pluginConfig.libs) {
-            for(let lib of pluginConfig.libs) {
-                meta += `\n * @needsLib ${lib}`;
-            }
-        }
-    
-        if(pluginConfig.optionalLibs) {
-            for(let lib of pluginConfig.optionalLibs) {
-                meta += `\n * @optionalLib ${lib}`;
-            }
-        }
 
         if(pluginConfig.hasSettings) {
             meta += '\n * @hasSettings true'

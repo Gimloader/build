@@ -6,16 +6,6 @@ export interface IPluginTypes {
      */
     isLibrary?: false;
     /**
-     * A list of libraries that the plugin requires to start.
-     * Libraries are formatted like "[name]" or "[name] | [downloadUrl]".
-     */
-    libs: string[];
-    /**
-     * A list of libraries that the plugin will optionally use.
-     * Libraries are formatted like "[name]" or "[name] | [downloadUrl]".
-     */
-    optionalLibs: string[];
-    /**
      * Whether the plugin has a settings menu.
      */
     hasSettings: boolean;
@@ -70,6 +60,16 @@ export type Config = (IPluginTypes | LibraryTypes) & {
      * Options to be passed to esbuild's build and context functions
      */
     esbuildOptions?: BuildOptions;
+    /**
+     * A list of libraries that the plugin requires to start.
+     * Libraries are formatted like "[name]" or "[name] | [downloadUrl]".
+     */
+    libs: string[];
+    /**
+     * A list of libraries that the plugin will optionally use.
+     * Libraries are formatted like "[name]" or "[name] | [downloadUrl]".
+     */
+    optionalLibs: string[];
 }
 
 export interface GLConfig {
