@@ -48,7 +48,7 @@ export function createHeader(config: Config) {
         meta += '\n * @isLibrary true';
     }
 
-    meta += '\n */\n';
+    meta += '\n */';
    
     return meta;
 }
