@@ -27,6 +27,7 @@ Config is housed in the file GL.config.js in the root folder.
 
 ##### Plugin Fields (Optional)
 - `hasSettings`: Set to true if the plugin has a settings menu, so the button can be shown when it is disabled.
+- `gamemodes`: A list of gamemode ids that the plugin will only run in. If omitted, the plugin will always run.
 
 ##### Library Fields
 - `isLibrary`: Set to true if you are building a library.

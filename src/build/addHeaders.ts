@@ -42,6 +42,12 @@ export function createHeader(config: Config) {
         if(pluginConfig.hasSettings) {
             meta += '\n * @hasSettings true'
         }
+
+        if(pluginConfig.gamemodes) {
+            for(let gamemode of pluginConfig.gamemodes) {
+                meta += `\n * @gamemode ${gamemode}`;
+            }
+        }
     }
 
     if(config.isLibrary) {

@@ -8,7 +8,11 @@ export interface IPluginTypes {
     /**
      * Whether the plugin has a settings menu.
      */
-    hasSettings: boolean;
+    hasSettings?: boolean;
+    /**
+     * A list of gamemode ids that the plugin will only run in. If omitted, the plugin will always run.
+     */
+    gamemodes?: string[];
 }
 
 export interface LibraryTypes {
@@ -64,12 +68,12 @@ export type Config = (IPluginTypes | LibraryTypes) & {
      * A list of libraries that the plugin requires to start.
      * Libraries are formatted like "[name]" or "[name] | [downloadUrl]".
      */
-    libs: string[];
+    libs?: string[];
     /**
      * A list of libraries that the plugin will optionally use.
      * Libraries are formatted like "[name]" or "[name] | [downloadUrl]".
      */
-    optionalLibs: string[];
+    optionalLibs?: string[];
 }
 
 export interface GLConfig {
