@@ -10,7 +10,7 @@ export interface IPluginTypes {
      */
     hasSettings?: boolean;
     /**
-     * A list of gamemode ids that the plugin will only run in. If omitted, the plugin will always run.
+     * A list of gamemode ids that `api.net.onLoad` will only trigger in by default.
      */
     gamemodes?: string[];
 }
