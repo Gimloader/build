@@ -15,7 +15,7 @@ export const SingleConfigSchema = z.object({
     gamemodes: z.array(z.string()).optional(),
     outdir: z.nullable(z.string()).optional(),
     plugins: z.array(z.any()).optional(),
-    esbuildOptions: z.object().optional(),
+    esbuildOptions: z.record(z.string(), z.any()).optional(),
     isLibrary: z.boolean().optional(),
     // Not sure if there's a way to make this conditional based on isLibrary
     hasSettings: z.boolean().optional()
@@ -27,7 +27,7 @@ export const WorkspaceConfigSchema = z.object({
     splitPluginsAndLibraries: z.boolean().optional(),
     outdir: z.string().optional(),
     plugins: z.array(z.any()).optional(),
-    esbuildOptions: z.object({}).optional(),
+    esbuildOptions: z.record(z.string(), z.any()).optional(),
     alias: z.record(z.string(), z.string()).optional().default({}).transform((obj) => {
         // make the keys lowercase
         let newObj: Record<string, string> = {};
