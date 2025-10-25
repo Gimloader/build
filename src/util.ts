@@ -1,18 +1,6 @@
-export default function parseHeader(code: string, headers: Record<string, any>) {
-    // parse headers for gimhook mods
-    if(code.startsWith("// gimhook: ")) {
-        try {
-            let gimhookHeader = JSON.parse(code.slice(11, code.indexOf('\n')).trim());
-            
-            if(gimhookHeader.name) headers.name = gimhookHeader.name;
-            if(gimhookHeader.description) headers.description = gimhookHeader.description;
-            if(gimhookHeader.author) headers.author = gimhookHeader.author;
-            if(gimhookHeader.version) headers.version = gimhookHeader.version;
-        } catch(e) {}
+import * as z from 'zod';
 
-        return headers;
-    }
-    
+export function parseHeader(code: string, headers: Record<string, any>) {   
     // parse the JSDoc header at the start (if it exists)
     let closingIndex = code.indexOf('*/');
     if(!(code.trimStart().startsWith('/**')) || closingIndex === -1) {
@@ -65,4 +53,17 @@ export default function parseHeader(code: string, headers: Record<string, any>) 
     }
 
     return headers;
+}
+
+export function formatTime(ms: number) {
+    if(ms < 2000) return `${Math.ceil(ms)}ms`;
+    else return `${(ms / 1000).toFixed(2)}s`;
+}
+
+export function handleError(err: unknown) {
+    if(err instanceof z.ZodError) {
+        console.error(z.formatError(err));
+    } else if(err instanceof Error) {
+        console.error(err.message);
+    }
 }

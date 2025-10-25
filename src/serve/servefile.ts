@@ -3,7 +3,7 @@ import Poller from './poller.js';
 import { watch } from 'chokidar';
 import fs from 'fs';
 import { readFile } from 'fs/promises';
-import parseHeader from '../parseHeader.js';
+import { parseHeader } from '../util.js';
 import waitForEnter from './manual.js';
 
 export default function serveFile(args: any) {

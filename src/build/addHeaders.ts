@@ -1,28 +1,17 @@
-import type { Config, IPluginTypes } from '../types.js';
+import { SingleConfigSchemaType } from './schema.js';
 
-export function createHeader(config: Config) {
+export function createHeader(config: SingleConfigSchemaType) {
     let meta = `/**
  * @name ${config.name}
  * @description ${config.description}
  * @author ${config.author}`;
    
-    if(config.version) {
-        meta += `\n * @version ${config.version}`;
-    }
+    if(config.version) meta += `\n * @version ${config.version}`;
+    if(config.downloadUrl) meta += `\n * @downloadUrl ${config.downloadUrl}`;
+    if(config.webpage) meta += `\n * @webpage ${config.webpage}`;
 
-    if(config.downloadUrl) {
-        meta += `\n * @downloadUrl ${config.downloadUrl}`;
-    }
-
-    if(config.webpage) {
-        meta += `\n * @webpage ${config.webpage}`;
-    }
-
-    if(config.reloadRequired === true) {
-        meta += '\n * @reloadRequired true';
-    } else if(config.reloadRequired === "ingame") {
-        meta += '\n * @reloadRequired ingame';
-    }
+    if(config.reloadRequired === true) meta += '\n * @reloadRequired true';
+    else if(config.reloadRequired === "ingame") meta += '\n * @reloadRequired ingame';
 
     if(config.libs) {
         for(let lib of config.libs) {
@@ -36,24 +25,17 @@ export function createHeader(config: Config) {
         }
     }
 
-    if(!config.isLibrary) {
-        let pluginConfig = config as IPluginTypes;
-
-        if(pluginConfig.hasSettings) {
-            meta += '\n * @hasSettings true'
-        }
-
-        if(pluginConfig.gamemodes) {
-            for(let gamemode of pluginConfig.gamemodes) {
-                meta += `\n * @gamemode ${gamemode}`;
-            }
+    if(!config.isLibrary && config.hasSettings) {
+        meta += '\n * @hasSettings true'
+    }
+    
+    if(config.gamemodes) {
+        for(let gamemode of config.gamemodes) {
+            meta += `\n * @gamemode ${gamemode}`;
         }
     }
 
-    if(config.isLibrary) {
-        meta += '\n * @isLibrary true';
-    }
-
+    if(config.isLibrary) meta += '\n * @isLibrary true';
     meta += '\n */';
    
     return meta;

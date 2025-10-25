@@ -1,47 +1,45 @@
 import type { BuildOptions, Plugin } from 'esbuild';
-import type { GLConfig, Config } from '../types.js';
-import { existsSync } from 'fs';
-import { join } from 'path';
-import { pathToFileURL } from 'url';
+import type { GLConfig } from '../types.js';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { createHeader } from './addHeaders.js';
+import { SingleConfigSchemaType, WorkspaceConfigSchemaType } from './schema.js';
 
-let startTime = 0;
+export function createEsbuildConfig(config: SingleConfigSchemaType, baseConfig?: WorkspaceConfigSchemaType, path?: string): BuildOptions {
+    let input = path ? join(path, config.input) : config.input;
 
-function logRebuildPlugin(onBuild: () => void): Plugin {
-    return {
-        name: "log-rebuild",
-        setup(build) {
-            build.onStart(() => {
-                process.stdout.write("Building...");
-                startTime = Date.now();
-            });
-            build.onEnd((result) => {
-                let time = Math.ceil(Date.now() - startTime);
-                console.log(`\rBuild completed in ${time}ms`);
+    let plugins: Plugin[] = [];
+    if(config.plugins) plugins.push(...config.plugins);
+    if(baseConfig?.plugins) plugins.push(...baseConfig.plugins);
 
-                if(result.warnings.length > 0) {
-                    console.warn(`\rBuild completed in ${time}ms with warnings: ${result.errors.map(e => e.text).join("\n")}`)
-                }
-
-                if(result.errors.length > 0) {
-                    console.error(`\rBuild failed: ${result.errors.map(e => e.text).join("\n")}`)
-                }
-
-                onBuild();
-            });
+    // Determine where to place the file
+    let outfile = "";
+    if(baseConfig && path) {
+        if(baseConfig.relativeOutput) {
+            // config > baseconfig > root of path
+            if(config.outdir) outfile = join(path, config.outdir);
+            else if(baseConfig.outdir) outfile = join(path, baseConfig.outdir);
+            else outfile = path;
+        } else {
+            outfile = baseConfig.outdir ?? "build";
+            if(baseConfig.splitPluginsAndLibraries) {
+                const subdir = config.isLibrary ? "libraries" : "plugins";
+                outfile = join(outfile, subdir);
+            }
         }
+    } else {
+        if(config.outdir) outfile = config.outdir;
+        else if(config.outdir === undefined) outfile = "build";
     }
-}
-
-export function createEsbuildConfig(config: Config): BuildOptions {
-    let plugins = config.plugins ?? [];
+    outfile = join(outfile, `${config.name}.js`);
 
     return {
-        entryPoints: [config.input],
+        entryPoints: [input],
         mainFields: ["svelte", "browser", "module", "main"],
         conditions: ["svelte", "browser"],
         bundle: true,
-        outfile: `build/${config.name}.js`,
+        outfile,
         format: "esm",
         plugins,
         banner: {
@@ -49,62 +47,29 @@ export function createEsbuildConfig(config: Config): BuildOptions {
         },
         jsx: "transform",
         jsxFactory: "GL.React.createElement",
+        loader: {
+            ".css": "text"
+        },
+        ...baseConfig?.esbuildOptions,
         ...config.esbuildOptions
     }
 }
 
-export function createEsbuildWatchConfig(config: Config, onBuild: () => void) {
-    let buildConfig = createEsbuildConfig(config);
+export async function getConfig(path?: string) {
+    let dir = process.cwd();
+    if(path) dir = join(dir, path);
 
-    buildConfig.plugins!.push(logRebuildPlugin(onBuild))
+    // Check if a config file exists
+    const longPath = join(dir, "gimloader.config.js");
+    const shortPath = join(dir, "GL.config.js");
 
-    return buildConfig;
-}
+    let configPath: string | null = null;
+    if(existsSync(longPath)) configPath = longPath;
+    else if(existsSync(shortPath)) configPath = shortPath;
+    if(!configPath) throw new Error("No Gimloader config file found");
 
-export function getConfig() {
-    return new Promise<Config>(async (res, rej) => {
-        const configPath = join(process.cwd(), 'GL.config.js');
+    const imported: GLConfig = await import(`${pathToFileURL(configPath).href}?t=${Date.now()}`);
+    if(!imported.default) throw new Error("Gimloader config doesn't export a default value!");
 
-        if(!existsSync(configPath)) {
-            rej('GL.config.js not found! Run gl init to create one.');
-            return;
-        }
-
-        const imported: GLConfig = await import(`${pathToFileURL(configPath).href}?t=${Date.now()}`);
-
-        // do some checks
-        if(!imported.default) {
-            rej("GL.config.js doesn't export a default value!");
-            return;
-        }
-
-        let config = imported.default;
-    
-        let mandatoryStrings = ['input', 'name', 'description', 'author'];
-        for(let str of mandatoryStrings) {
-            let type = typeof config[str];
-            if(type === 'undefined') {
-                rej(`GL.config.js is missing the ${str} field!`);
-                return;
-            }
-    
-            if(type !== 'string') {
-                rej(`GL.config.js ${str} field is not a string!`);
-                return;
-            }
-        }
-    
-        let optionalArrays = ['libs', 'optionalLibs', 'plugins'];
-    
-        for(let arr of optionalArrays) {
-            if(config[arr]) {
-                if(!Array.isArray(config[arr])) {
-                    rej(`GL.config.js ${arr} field is not an array!`);
-                    return;
-                }
-            }
-        }
-    
-        res(config);
-    });
+    return imported.default;
 }

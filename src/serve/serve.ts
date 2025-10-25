@@ -1,82 +1,129 @@
-import esbuild, { type BuildContext } from 'esbuild';
-import { createEsbuildWatchConfig, getConfig } from '../build/getConfig.js';
+import esbuild, { BuildOptions, type BuildContext } from 'esbuild';
+import { createEsbuildConfig, getConfig } from '../build/getConfig.js';
 import chokidar from 'chokidar';
 import { join } from 'path';
 import fs from 'fs/promises';
-import build from '../build/build.js';
 import Poller from './poller.js';
 import waitForEnter from './manual.js';
+import { formatTime, handleError } from '../util.js';
+import { ConfigSchema, SingleConfigSchema, SingleConfigSchemaType } from '../build/schema.js';
+import { logRebuildPlugin } from "./plugins.js";
 
-export default function serve(args: any) {
-    let ctx: BuildContext | null = null;
+export default async function serve(args: any) {
+    const rootConfigImport = await getConfig();
+    let rootConfig = ConfigSchema.parse(rootConfigImport);
+    if(rootConfig.type === "workspace" && !args.path) {
+        console.error("No path specified to serve!");
+        return;
+    }
 
-    let poller = new Poller();
+    let childConfig: SingleConfigSchemaType | null = null;
+    let singleConfig: SingleConfigSchemaType;
 
-    const onCodeUpdate = async (name: string) => {
-        let outputPath = join(process.cwd(), 'build', `${name}.js`);
+    const poller = new Poller();
+    const onCodeUpdate = async (path?: string) => {
+        if(!path) return;
 
-        let newCode = await fs.readFile(outputPath, 'utf-8');
-        
+        let newCode = await fs.readFile(path, 'utf-8');
         poller.updateCode(newCode);
     }
 
-    const makeWatcher = () => {
+    let ctx: BuildContext | null = null;
+    const makeWatcher = async () => {
         if(ctx) ctx.dispose();
 
-        getConfig()
-        .then(async (config) => {
-            poller.isLibrary = config.isLibrary === true;
+        try {
+            let buildConfig: BuildOptions;
+            if(rootConfig.type === "workspace") {
+                const path = rootConfig.alias[args.path.toLowerCase()] ?? args.path;
+                buildConfig = createEsbuildConfig(childConfig!, rootConfig, path);
+            } else {
+                buildConfig = createEsbuildConfig(rootConfig);
+            }
 
-            let buildConfig = createEsbuildWatchConfig(config, () => {
-                onCodeUpdate(config.name);
-            });
+            buildConfig.plugins?.push(logRebuildPlugin(() => {
+                onCodeUpdate(buildConfig.outfile);
+            }));
 
             ctx = await esbuild.context(buildConfig);
             await ctx.watch();
-        })
-        .catch((err: string) => {
-            console.error(err);
-        })
+        } catch(e) {
+            handleError(e);
+        }
     }
 
-    let isBuilding = false;
-    const buildPlugin = () => {
-        isBuilding = true;
+    const buildPlugin = async () => {
         process.stdout.write("\x1b[2K\rBuilding...");
+    
+        try {
+            let start = performance.now();
 
-        let start = Date.now();
-        build()
-            .then((config) => {
-                let time = Math.ceil(Date.now() - start);
-                console.log(`\rBuild completed in ${time}ms`);
-                poller.isLibrary = config.isLibrary === true;
-                onCodeUpdate(config.name);
-            })
-            .catch((err: string) => {
-                console.error(`\rBuild failed: ${err}`);
-            })
-            .finally(() => {
-                isBuilding = false
-                process.stdout.write("Press enter to build...");
-            });
+            let buildConfig: BuildOptions;
+            if(rootConfig.type === "workspace") {
+                const path = rootConfig.alias[args.path.toLowerCase()] ?? args.path;
+                buildConfig = createEsbuildConfig(singleConfig, rootConfig, path);
+            } else {
+                buildConfig = createEsbuildConfig(singleConfig);
+            }
+
+            await esbuild.build(buildConfig);
+    
+            console.log(`\rBuild completed in ${formatTime(performance.now() - start)}`);
+            poller.isLibrary = singleConfig.isLibrary === true;
+            onCodeUpdate(buildConfig.outfile);
+        } catch {}
     }
+
+    const configFiles = ["gimloader.config.js", "GL.config.js"];
+
+    if(rootConfig.type === "workspace") {
+        const path = rootConfig.alias[args.path.toLowerCase()] ?? args.path;
+        const files = configFiles.map(f => join(path, f));
+        
+        // Import the single config for what we're serving
+        const singleImport = await getConfig(path);
+        childConfig = SingleConfigSchema.parse(singleImport);
+        singleConfig = childConfig;
+        
+        // Watch the single config files for changes
+        chokidar.watch(files, { ignoreInitial: true }).on("change", async () => {
+            const newSingleImport = await getConfig(path);
+            childConfig = SingleConfigSchema.parse(newSingleImport);
+            singleConfig = childConfig;
+            
+            if(!args.manual) {
+                console.log("Gimloader config changed, rebuilding...");
+                makeWatcher();
+            }
+        });
+    } else {
+        singleConfig = rootConfig;
+    }
+
+    // Watch the root file for changes
+    chokidar.watch(configFiles, { ignoreInitial: true }).on("change", async () => {
+        const newRootImport = await getConfig();
+        rootConfig = ConfigSchema.parse(newRootImport);
+        if(rootConfig.type !== "workspace") singleConfig = rootConfig;
+
+        if(!args.manual) {
+            console.log("Gimloader config changed, rebuilding...");
+            makeWatcher();
+        }
+    });
 
     if(args.manual) {
+        let isBuilding = true;
+
         waitForEnter(() => {
             if(isBuilding) return;
-            buildPlugin();
+
+            isBuilding = true;
+            buildPlugin().finally(() => isBuilding = false);
         }, "Press Enter to rebuild, and press Ctrl+C to exit\nPress enter to build...")
 
-        buildPlugin();
+        buildPlugin().finally(() => isBuilding = false);
     } else {
         makeWatcher();
-    
-        // watch for config changes
-        chokidar.watch('GL.config.js', {
-            ignoreInitial: true
-        }).on('change', () => {
-            console.log("GL.config.js changed! Rebuilding...")
-            makeWatcher();
-        });
-    }   
+    }
 }
