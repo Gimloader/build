@@ -18,7 +18,8 @@ export const SingleConfigSchema = z.object({
     esbuildOptions: z.record(z.string(), z.any()).optional(),
     isLibrary: z.boolean().optional(),
     // Not sure if there's a way to make this conditional based on isLibrary
-    hasSettings: z.boolean().optional()
+    hasSettings: z.boolean().optional(),
+    deprecated: z.string().optional()
 });
 
 export const WorkspaceConfigSchema = z.object({

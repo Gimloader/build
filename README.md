@@ -43,6 +43,7 @@ Config is housed in the file gimloader.config.js in the folder where the script 
 - `outdir`: Where to output the bundled script ("./build" by default). Set to null for the directory root.
 - `plugins`: An array of Esbuild plugins to use.
 - `esbuildOptions`: Options to pass to esbuild.
+- `deprecated`: A message if the script should no longer be used.
 
 ##### Plugin Fields (Optional)
 - `hasSettings`: Set to true if the plugin has a settings menu, so the button can be shown when it is disabled.

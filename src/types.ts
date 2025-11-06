@@ -55,6 +55,8 @@ export type SingleConfig = (PluginTypes | LibraryTypes) & BaseConfig & {
     optionalLibs?: string[];
     /** A list of gamemode ids that `api.net.onLoad` will only trigger in by default. */
     gamemodes?: string[];
+    /** A message if the script should no longer be used */
+    deprecated?: string;
 }
 
 export interface WorkspaceConfig extends BaseConfig {

@@ -36,6 +36,7 @@ export function createHeader(config: SingleConfigSchemaType) {
     }
 
     if(config.isLibrary) meta += '\n * @isLibrary true';
+    if(config.deprecated !== undefined) meta += `\n * @deprecated ${config.deprecated}`;
     meta += '\n */';
    
     return meta;
