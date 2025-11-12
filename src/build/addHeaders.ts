@@ -34,6 +34,12 @@ export function createHeader(config: SingleConfigSchemaType) {
             meta += `\n * @gamemode ${gamemode}`;
         }
     }
+    
+    if(config.changelog) {
+        for(let change of config.changelog) {
+            meta += `\n * @changelog ${change}`;
+        }
+    }
 
     if(config.isLibrary) meta += '\n * @isLibrary true';
     if(config.deprecated !== undefined) meta += `\n * @deprecated ${config.deprecated}`;

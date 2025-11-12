@@ -44,6 +44,7 @@ Config is housed in the file gimloader.config.js in the folder where the script 
 - `plugins`: An array of Esbuild plugins to use.
 - `esbuildOptions`: Options to pass to esbuild.
 - `deprecated`: A message if the script should no longer be used.
+- `changelog`: A list of changes to display when the user updates to the current version.
 
 ##### Plugin Fields (Optional)
 - `hasSettings`: Set to true if the plugin has a settings menu, so the button can be shown when it is disabled.
