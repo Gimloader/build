@@ -4,7 +4,6 @@ const port = 5822; // picked at random
 
 export default class Poller {
     code: string | null = null;
-    isLibrary = false;
     codeSent = false;
     longPollRes: http.ServerResponse | null = null;
 
@@ -13,7 +12,6 @@ export default class Poller {
         this.code = code;
 
         if(this.longPollRes) {
-            this.longPollRes.setHeader('is-library', this.isLibrary.toString());
             this.longPollRes.setHeader('access-control-allow-origin', '*');
             this.longPollRes.write(this.code);
             this.longPollRes.end();
@@ -30,7 +28,6 @@ export default class Poller {
         const server = http.createServer((req, res) => {
             if(req.url === "/getCode") {
                 if(this.code) {
-                    res.setHeader('is-library', this.isLibrary.toString());
                     res.setHeader('content-type', 'application/javascript');
                     res.setHeader('access-control-allow-origin', '*');
                     res.write(this.code);
@@ -53,7 +50,6 @@ export default class Poller {
                     
                     this.longPollRes = res;
                 } else {
-                    res.setHeader('is-library', this.isLibrary.toString());
                     res.write(this.code);
                     res.end();
                     this.codeSent = true;

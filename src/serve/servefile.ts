@@ -20,10 +20,7 @@ export default function serveFile(args: any) {
         let start = Date.now();
         process.stdout.write("\rUpdating...                 ");
         readFile(file, { encoding: 'utf-8' })
-            .then((code) => {
-                let headers = parseHeader(code, { isLibrary: "false" });
-                poller.isLibrary = headers.isLibrary !== "false";
-        
+            .then((code) => {        
                 poller.updateCode(code);
                 console.log(`\rUpdated in ${Date.now() - start}ms`);
             })

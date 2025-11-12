@@ -69,7 +69,6 @@ export default async function serve(args: any) {
             await esbuild.build(buildConfig);
     
             console.log(`\rBuild completed in ${formatTime(performance.now() - start)}`);
-            poller.isLibrary = singleConfig.isLibrary === true;
             onCodeUpdate(buildConfig.outfile);
         } catch {}
     }
