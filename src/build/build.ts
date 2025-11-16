@@ -2,6 +2,30 @@ import { createEsbuildConfig, getConfig } from './getConfig.js';
 import esbuild from 'esbuild';
 import { ConfigSchema, SingleConfigSchema, SingleConfigSchemaType, WorkspaceConfigSchemaType } from './schema.js';
 import { formatTime, handleError } from '../util.js';
+import fsp from 'fs/promises';
+import { join } from 'path';
+
+export async function workspaceAutoalias(config: WorkspaceConfigSchemaType) {
+    if(!config.autoAlias) return;
+
+    await Promise.all(config.autoAlias.map(async (path) => {
+        const items = await fsp.readdir(path, { withFileTypes: true });
+
+        for(const item of items) {
+            if(!item.isDirectory()) continue;
+
+            const alias = item.name.toLowerCase();
+            const itemPath = join(path, item.name);
+
+            // If there's two of the same throw an error
+            if(config.alias[alias]) {
+                throw new Error(`Duplicate alias found: ${alias} in paths ${config.alias[alias]} and ${itemPath}`);
+            }
+
+            config.alias[alias] = itemPath;
+        }
+    }));
+}
 
 export default async function build(options: any) {
     try {
@@ -12,8 +36,10 @@ export default async function build(options: any) {
             await buildSingle(config);
             return;
         }
-    
-        let paths: string[] = options.path;
+
+        await workspaceAutoalias(config);
+
+        let paths: string[] = options.path;    
         if(options.all) paths = Object.values(config.alias);
         else paths = paths.map((p) => config.alias[p.toLowerCase()] ?? p);
     

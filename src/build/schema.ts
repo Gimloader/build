@@ -38,7 +38,8 @@ export const WorkspaceConfigSchema = z.object({
         }
         
         return newObj;
-    })
+    }),
+    autoAlias: z.array(z.string()).optional()
 });
 
 export const ConfigSchema = z.discriminatedUnion("type", [

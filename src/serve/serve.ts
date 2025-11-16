@@ -8,6 +8,7 @@ import waitForEnter from './manual.js';
 import { formatTime, handleError } from '../util.js';
 import { ConfigSchema, SingleConfigSchema, SingleConfigSchemaType } from '../build/schema.js';
 import { logRebuildPlugin } from "./plugins.js";
+import { workspaceAutoalias } from '../build/build.js';
 
 export default async function serve(args: any) {
     const rootConfigImport = await getConfig();
@@ -15,6 +16,10 @@ export default async function serve(args: any) {
     if(rootConfig.type === "workspace" && !args.path) {
         console.error("No path specified to serve!");
         return;
+    }
+
+    if(rootConfig.type === "workspace") {
+        await workspaceAutoalias(rootConfig);
     }
 
     let childConfig: SingleConfigSchemaType | null = null;
@@ -103,7 +108,11 @@ export default async function serve(args: any) {
     chokidar.watch(configFiles, { ignoreInitial: true }).on("change", async () => {
         const newRootImport = await getConfig();
         rootConfig = ConfigSchema.parse(newRootImport);
-        if(rootConfig.type !== "workspace") singleConfig = rootConfig;
+        if(rootConfig.type === "workspace") {
+            await workspaceAutoalias(rootConfig);
+        } else {
+            singleConfig = rootConfig;
+        }
 
         if(!args.manual) {
             console.log("Gimloader config changed, rebuilding...");

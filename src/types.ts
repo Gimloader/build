@@ -73,6 +73,8 @@ export interface WorkspaceConfig extends BaseConfig {
     splitPluginsAndLibraries?: boolean;
     /** Maps a short name to a path to a script */
     alias?: Record<string, string>;
+    /** Automatically scan directories within these directories for scripts, and add aliases for them */
+    autoAlias?: string[];
 }
 
 export type Config = SingleConfig | WorkspaceConfig;

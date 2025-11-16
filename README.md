@@ -20,6 +20,7 @@ The configuration for the workspace is housed in the file gimloader.config.js in
 - `relativeOutput`: Whether to output the bundled scripts relative to their folder.
 - `splitPluginsAndLibraries`: Whether to output plugins in a /plugins/ and libraries in a /libraries/ directory.
 - `alias`: An object mapping short names for scripts to the path to them.
+- `autoAlias`: An array of paths to directories that will have all their subdirectories automatically aliased.
 - `plugins`: An array of Esbuild plugins to use.
 - `esbuildOptions`: Options to pass to esbuild.
 
