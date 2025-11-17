@@ -26,6 +26,15 @@ export default class Poller {
         let lastUid = '';
 
         const server = http.createServer((req, res) => {
+            if (req.method === 'OPTIONS') {
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.setHeader('Access-Control-Allow-Headers', 'uid, Content-Type');
+                res.setHeader('Access-Control-Allow-Methods', 'GET');
+                res.writeHead(204);
+                res.end();
+                return; 
+            }
+
             if(req.url === "/getCode") {
                 if(this.code) {
                     res.setHeader('content-type', 'application/javascript');
