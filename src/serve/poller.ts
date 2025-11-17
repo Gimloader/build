@@ -30,7 +30,7 @@ export default class Poller {
                 res.setHeader('Access-Control-Allow-Origin', '*');
                 res.setHeader('Access-Control-Allow-Headers', 'uid, Content-Type');
                 res.setHeader('Access-Control-Allow-Methods', 'GET');
-                res.writeHead(204)
+                res.writeHead(204);
                 res.end();
                 return; 
             }
