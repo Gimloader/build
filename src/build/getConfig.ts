@@ -6,6 +6,13 @@ import { pathToFileURL } from 'node:url';
 import { createHeader } from './addHeaders.js';
 import { SingleConfigSchemaType, WorkspaceConfigSchemaType } from './schema.js';
 
+// In order of precedence
+export const configFiles = [
+    "gimloader.config.ts",
+    "gimloader.config.js",
+    "GL.config.js"
+];
+
 export function createEsbuildConfig(config: SingleConfigSchemaType, baseConfig?: WorkspaceConfigSchemaType, path?: string): BuildOptions {
     let input = path ? join(path, config.input) : config.input;
 
@@ -60,12 +67,15 @@ export async function getConfig(path?: string) {
     if(path) dir = join(dir, path);
 
     // Check if a config file exists
-    const longPath = join(dir, "gimloader.config.js");
-    const shortPath = join(dir, "GL.config.js");
-
     let configPath: string | null = null;
-    if(existsSync(longPath)) configPath = longPath;
-    else if(existsSync(shortPath)) configPath = shortPath;
+    for(let file of configFiles) {
+        const path = join(dir, file);
+        if(existsSync(path)) {
+            configPath = path;
+            break;
+        }
+    }
+
     if(!configPath) throw new Error("No Gimloader config file found");
 
     const imported: GLConfig = await import(`${pathToFileURL(configPath).href}?t=${Date.now()}`);

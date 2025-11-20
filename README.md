@@ -8,7 +8,7 @@ To get started, run `npm create @gimloader` in the directory you wish to create 
 
 ## Config
 
-There are two ways to set up using the bundler. You can either have one project per script, or a project with multiple workspaces for different scripts.
+There are two ways to set up using the bundler. You can either have one project per script, or a project with multiple workspaces for different scripts. Your config should be the default export from `gimloader.config.js` (`gimloader.config.ts` is also supported if you use Deno or Bun). You can wrap your export in the `singleConfig()` or `workspaceConfig()` functions if you want types.
 
 ### Workspace Config
 

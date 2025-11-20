@@ -1,5 +1,5 @@
 import esbuild, { BuildOptions, type BuildContext } from 'esbuild';
-import { createEsbuildConfig, getConfig } from '../build/getConfig.js';
+import { configFiles, createEsbuildConfig, getConfig } from '../build/getConfig.js';
 import chokidar from 'chokidar';
 import { join } from 'path';
 import fs from 'fs/promises';
@@ -77,8 +77,6 @@ export default async function serve(args: any) {
             onCodeUpdate(buildConfig.outfile);
         } catch {}
     }
-
-    const configFiles = ["gimloader.config.js", "GL.config.js"];
 
     if(rootConfig.type === "workspace") {
         const path = rootConfig.alias[args.path.toLowerCase()] ?? args.path;
