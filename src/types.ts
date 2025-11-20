@@ -42,7 +42,7 @@ export type SingleConfig = (PluginTypes | LibraryTypes) & BaseConfig & {
      * Whether the browser needs to be reloaded after the plugin is added.
      * If set to "ingame" it will only reload if the user is currently in a game.
      */
-    reloadRequired?: boolean | "ingame";
+    reloadRequired?: boolean | "ingame" | "notingame";
     /**
      * A list of libraries that the plugin requires to start.
      * Libraries are formatted like "[name]" or "[name] | [downloadUrl]".
