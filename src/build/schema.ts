@@ -9,7 +9,7 @@ export const SingleConfigSchema = z.object({
     version: z.string().optional(),
     downloadUrl: z.string().optional(),
     webpage: z.string().optional(),
-    reloadRequired: z.union([z.boolean(), z.literal("ingame"), z.literal("notingame)]).optional(),
+    reloadRequired: z.union([z.boolean(), z.literal("ingame"), z.literal("notingame")]).optional(),
     libs: z.array(z.string()).optional(),
     optionalLibs: z.array(z.string()).optional(),
     gamemodes: z.array(z.string()).optional(),
