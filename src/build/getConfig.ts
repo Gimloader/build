@@ -71,6 +71,9 @@ export async function getConfig(path?: string) {
     for(let file of configFiles) {
         const path = join(dir, file);
         if(existsSync(path)) {
+            if(file === "GL.config.js") {
+                console.warn("'GL.config.js' is deprecated. Please use 'gimloader.config.js' or 'gimloader.config.ts'.");
+            }
             configPath = path;
             break;
         }
