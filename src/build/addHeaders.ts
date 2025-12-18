@@ -14,8 +14,9 @@ export function createHeader(config: SingleConfigSchemaType) {
     else if(config.reloadRequired === "ingame") meta += '\n * @reloadRequired ingame';
     else if(config.reloadRequired === "notingame") meta += '\n * @reloadRequired notingame';
 
-    if(config.libs) {
-        for(let lib of config.libs) {
+    const libs = config.needsLibs ?? config.libs;
+    if(libs) {
+        for(let lib of libs) {
             meta += `\n * @needsLib ${lib}`;
         }
     }
@@ -23,6 +24,12 @@ export function createHeader(config: SingleConfigSchemaType) {
     if(config.optionalLibs) {
         for(let lib of config.optionalLibs) {
             meta += `\n * @optionalLib ${lib}`;
+        }
+    }
+
+    if(config.needsPlugins) {
+        for(let plugin of config.needsPlugins) {
+            meta += `\n * @needsPlugin ${plugin}`;
         }
     }
 

@@ -37,9 +37,10 @@ Config is housed in the file gimloader.config.js in the folder where the script 
 ##### Optional Fields
 - `version`: The version of the script.
 - `downloadUrl`: The download URL for the script, used by Gimloader for updates.
-- `reloadRequired`: Set to true if the script needs a reload to take effect, or set to "ingame" if it only needs a reload when in-game.
-- `libs`: A list of libraries to load. These strings should look like either "[library name]" or "[library name] | [download url]".
+- `reloadRequired`: Set to true if the script needs a reload to take effect, or set to "ingame" if it only needs a reload when in-game, or "notingame" for the opposite.
+- `needsLibs`: A list of libraries to load. These strings should look like either "[library name]" or "[library name] | [download url]".
 - `optionalLibs`: The same as libs, but the plugin will still be run without these libraries.
+- `needsPlugins`: The same as needsLibs, but for plugin dependencies.
 - `gamemodes`: A list of gamemode ids that `api.net.onLoad` will only trigger in by default.
 - `outdir`: Where to output the bundled script ("./build" by default). Set to null for the directory root.
 - `plugins`: An array of Esbuild plugins to use.

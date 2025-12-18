@@ -10,8 +10,11 @@ export const SingleConfigSchema = z.object({
     downloadUrl: z.string().optional(),
     webpage: z.string().optional(),
     reloadRequired: z.union([z.boolean(), z.literal("ingame"), z.literal("notingame")]).optional(),
+    // libs is deprecated, use needsLibs instead
     libs: z.array(z.string()).optional(),
+    needsLibs: z.array(z.string()).optional(),
     optionalLibs: z.array(z.string()).optional(),
+    needsPlugins: z.array(z.string()).optional(),
     gamemodes: z.array(z.string()).optional(),
     outdir: z.nullable(z.string()).optional(),
     plugins: z.array(z.any()).optional(),
