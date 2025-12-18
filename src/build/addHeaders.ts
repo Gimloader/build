@@ -12,6 +12,7 @@ export function createHeader(config: SingleConfigSchemaType) {
 
     if(config.reloadRequired === true) meta += '\n * @reloadRequired true';
     else if(config.reloadRequired === "ingame") meta += '\n * @reloadRequired ingame';
+    else if(config.reloadRequired === "notingame") meta += '\n * @reloadRequired notingame';
 
     if(config.libs) {
         for(let lib of config.libs) {
