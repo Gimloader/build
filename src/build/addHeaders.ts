@@ -17,19 +17,23 @@ export function createHeader(config: SingleConfigSchemaType) {
     const libs = config.needsLibs ?? config.libs;
     if(libs) {
         for(let lib of libs) {
-            meta += `\n * @needsLib ${lib}`;
+            if(typeof lib === 'string') {
+                meta += `\n * @needsLib ${lib}`;
+            } else {
+                meta += `\n * @needsLib ${lib.name}${lib.url && ` | ${lib.url}`}`
+            }
         }
     }
 
     if(config.optionalLibs) {
         for(let lib of config.optionalLibs) {
-            meta += `\n * @optionalLib ${lib}`;
+            meta += `\n * @optionalLib ${lib.name}${lib.url && ` | ${lib.url}`}`;
         }
     }
 
     if(config.needsPlugins) {
         for(let plugin of config.needsPlugins) {
-            meta += `\n * @needsPlugin ${plugin}`;
+            meta += `\n * @needsPlugin ${plugin.name}${plugin.url && ` | ${plugin.url}`}`;
         }
     }
 
