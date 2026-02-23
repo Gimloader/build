@@ -27,13 +27,21 @@ export function createHeader(config: SingleConfigSchemaType) {
 
     if(config.optionalLibs) {
         for(let lib of config.optionalLibs) {
-            meta += `\n * @optionalLib ${lib.name}${lib.url && ` | ${lib.url}`}`;
+            if(typeof lib === "string") {
+                meta += lib;
+            } else {
+                meta += `\n * @optionalLib ${lib.name}${lib.url && ` | ${lib.url}`}`;
+            }
         }
     }
 
     if(config.needsPlugins) {
         for(let plugin of config.needsPlugins) {
-            meta += `\n * @needsPlugin ${plugin.name}${plugin.url && ` | ${plugin.url}`}`;
+            if(typeof plugin === "string") {
+                meta += plugin;
+            } else {
+                meta += `\n * @needsPlugin ${plugin.name}${plugin.url && ` | ${plugin.url}`}`;
+            }
         }
     }
 

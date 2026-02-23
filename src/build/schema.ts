@@ -1,9 +1,12 @@
 import * as z from 'zod';
 
-const DependencySchema = z.array(z.object({
-    name: z.string(),
-    url: z.string().optional()
-}));
+const DependencySchema = z.union([
+    z.array(z.object({
+        name: z.string(),
+        url: z.string().optional()
+    })),
+    z.string()
+]);
 
 export const SingleConfigSchema = z.object({
     type: z.literal("single").optional(),

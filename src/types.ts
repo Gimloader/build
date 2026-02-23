@@ -21,10 +21,10 @@ interface BaseConfig {
     esbuildOptions?: BuildOptions;
 }
 
-interface Dependency {
+type Dependency = {
     name: string;
     url?: string;
-}
+} | string;
 
 export type SingleConfig = (PluginTypes | LibraryTypes) & BaseConfig & {
     /** Whether the project is one script or a workspace with multiple */
