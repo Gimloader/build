@@ -21,7 +21,7 @@ interface BaseConfig {
     esbuildOptions?: BuildOptions;
 }
 
-type Dependency = {
+export type Dependency = {
     name: string;
     url?: string;
 } | string;

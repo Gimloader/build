@@ -1,4 +1,10 @@
+import { Dependency } from '../types.js';
 import { SingleConfigSchemaType } from './schema.js';
+
+function formatDep(dep: Dependency) {
+    if (typeof dep === "string") return dep;
+    return `${dep.name}${dep.url ? ` | ${dep.url}` : ""}`
+}
 
 export function createHeader(config: SingleConfigSchemaType) {
     let meta = `/**
@@ -17,31 +23,19 @@ export function createHeader(config: SingleConfigSchemaType) {
     const libs = config.needsLibs ?? config.libs;
     if(libs) {
         for(let lib of libs) {
-            if(typeof lib === 'string') {
-                meta += `\n * @needsLib ${lib}`;
-            } else {
-                meta += `\n * @needsLib ${lib.name}${lib.url && ` | ${lib.url}`}`
-            }
+            meta += `\n * @needsLib ${formatDep(lib)}`;
         }
     }
 
     if(config.optionalLibs) {
         for(let lib of config.optionalLibs) {
-            if(typeof lib === "string") {
-                meta += lib;
-            } else {
-                meta += `\n * @optionalLib ${lib.name}${lib.url && ` | ${lib.url}`}`;
-            }
+            meta += `\n * @optionalLib ${formatDep(lib)}`;
         }
     }
 
     if(config.needsPlugins) {
         for(let plugin of config.needsPlugins) {
-            if(typeof plugin === "string") {
-                meta += plugin;
-            } else {
-                meta += `\n * @needsPlugin ${plugin.name}${plugin.url && ` | ${plugin.url}`}`;
-            }
+            meta += `\n * @needsPlugin ${formatDep(plugin)}`;
         }
     }
 
