@@ -59,7 +59,7 @@ export type SingleConfig = (PluginTypes | LibraryTypes) & BaseConfig & {
      */
     needsPlugins?: string[];
     /** A list of gamemode ids that `api.net.onLoad` will only trigger in by default. */
-    gamemodes?: string[];
+    gamemodes?: ("*" | "2d" | "1d" | "official" | "official-2d" | "creative" | "unknown" | string & {})[];
     /** A message if the script should no longer be used. */
     deprecated?: string;
     /** A list of changes to display when the user updates to the current version. */
