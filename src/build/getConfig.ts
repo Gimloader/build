@@ -13,14 +13,7 @@ export const configFiles = [
     "GL.config.js"
 ];
 
-export function createEsbuildConfig(config: SingleConfigSchemaType, baseConfig?: WorkspaceConfigSchemaType, path?: string): BuildOptions {
-    let input = path ? join(path, config.input) : config.input;
-
-    let plugins: Plugin[] = [];
-    if(config.plugins) plugins.push(...config.plugins);
-    if(baseConfig?.plugins) plugins.push(...baseConfig.plugins);
-
-    // Determine where to place the file
+export function getOutfile(config: SingleConfigSchemaType, baseConfig?: WorkspaceConfigSchemaType, path?: string) {
     let outfile = "";
     if(baseConfig && path) {
         if(baseConfig.relativeOutput) {
@@ -39,14 +32,22 @@ export function createEsbuildConfig(config: SingleConfigSchemaType, baseConfig?:
         if(config.outdir) outfile = config.outdir;
         else if(config.outdir === undefined) outfile = "build";
     }
-    outfile = join(outfile, `${config.name}.js`);
+    return join(outfile, `${config.name}.js`);
+}
+
+export function createEsbuildConfig(config: SingleConfigSchemaType, baseConfig?: WorkspaceConfigSchemaType, path?: string): BuildOptions {
+    let input = path ? join(path, config.input) : config.input;
+
+    let plugins: Plugin[] = [];
+    if(config.plugins) plugins.push(...config.plugins);
+    if(baseConfig?.plugins) plugins.push(...baseConfig.plugins);
 
     return {
         entryPoints: [input],
         mainFields: ["svelte", "browser", "module", "main"],
         conditions: ["svelte", "browser"],
         bundle: true,
-        outfile,
+        outfile: getOutfile(config, baseConfig, path),
         format: "esm",
         plugins,
         banner: {

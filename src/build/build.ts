@@ -39,9 +39,9 @@ export default async function build(options: any) {
 
         await workspaceAutoalias(config);
 
-        let paths: string[] = options.path;    
+        let paths: string[];
         if(options.all) paths = Object.values(config.alias);
-        else paths = paths.map((p) => config.alias[p.toLowerCase()] ?? p);
+        else paths = options.path.map((p: string) => config.alias[p.toLowerCase()] ?? p);
     
         if(paths.length === 0) throw new Error("No path(s) specified to build!")
         if(paths.length === 1) {
