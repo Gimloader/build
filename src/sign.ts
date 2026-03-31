@@ -29,8 +29,11 @@ export default async function sign(args: any) {
             }));
         }
     
-        const text = await fsp.readFile(args.jwk, "utf-8");
-        const jwk = JSON.parse(text);
+        let jwkText = process.env.GIMLOADER_JWK;
+        if(!jwkText && !args.jwk) throw new Error("No JSON web key provided via --jwk or GIMLOADER_JWK environment variable!");
+        jwkText ??= await fsp.readFile(args.jwk, "utf-8");
+
+        const jwk = JSON.parse(jwkText);
         const key = await crypto.subtle.importKey("jwk", jwk, { name: "Ed25519" }, false, ["sign"]);
 
         const results = await Promise.allSettled(filePaths.map(path => signFile(path, key)));

@@ -31,7 +31,7 @@ yargs(hideBin(process.argv))
     .command("sign [path..]", "Signs a script", (yargs) => {
         yargs.positional("path", { describe: signPathDescription, type: "string" })
             .option("all", { alias: "a", describe: signAllDescription, type: "boolean" })
-            .option("jwk", { describe: signJwkDescription, demandOption: true, type: "string" });
+            .option("jwk", { describe: signJwkDescription, type: "string" });
     }, sign)
     .demandCommand(1)
     .help()
