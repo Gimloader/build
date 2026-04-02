@@ -21,6 +21,11 @@ interface BaseConfig {
     esbuildOptions?: BuildOptions;
 }
 
+export type Dependency = {
+    name: string;
+    url?: string;
+} | string;
+
 export type SingleConfig = (PluginTypes | LibraryTypes) & BaseConfig & {
     /** Whether the project is one script or a workspace with multiple */
     type?: "single";
@@ -45,19 +50,16 @@ export type SingleConfig = (PluginTypes | LibraryTypes) & BaseConfig & {
     reloadRequired?: boolean | "ingame" | "notingame";
     /**
      * A list of libraries that the plugin requires to start.
-     * Libraries are formatted like "[name]" or "[name] | [downloadUrl]".
      */
-    needsLibs?: string[];
+    needsLibs?: Dependency[];
     /**
      * A list of libraries that the plugin will optionally use.
-     * Libraries are formatted like "[name]" or "[name] | [downloadUrl]".
      */
-    optionalLibs?: string[];
+    optionalLibs?: Dependency[];
     /**
      * A list of plugin dependencies the plugin requires to start.
-     * Plugins are formatted like "[name]" or "[name] | [downloadUrl]".
      */
-    needsPlugins?: string[];
+    needsPlugins?: Dependency[];
     /** A list of gamemode ids that `api.net.onLoad` will only trigger in by default. */
     gamemodes?: ("*" | "2d" | "1d" | "official" | "official-2d" | "creative" | "unknown" | string & {})[];
     /** A message if the script should no longer be used. */

@@ -1,5 +1,13 @@
 import * as z from 'zod';
 
+const DependencySchema = z.union([
+    z.array(z.object({
+        name: z.string(),
+        url: z.string().optional()
+    })),
+    z.string()
+]);
+
 export const SingleConfigSchema = z.object({
     type: z.literal("single").optional(),
     input: z.string(),
@@ -12,9 +20,9 @@ export const SingleConfigSchema = z.object({
     reloadRequired: z.union([z.boolean(), z.literal("ingame"), z.literal("notingame")]).optional(),
     // libs is deprecated, use needsLibs instead
     libs: z.array(z.string()).optional(),
-    needsLibs: z.array(z.string()).optional(),
-    optionalLibs: z.array(z.string()).optional(),
-    needsPlugins: z.array(z.string()).optional(),
+    needsLibs: DependencySchema.optional(),
+    optionalLibs: DependencySchema.optional(),
+    needsPlugins: DependencySchema.optional(),
     gamemodes: z.array(z.string()).optional(),
     outdir: z.nullable(z.string()).optional(),
     plugins: z.array(z.any()).optional(),

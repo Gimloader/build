@@ -1,4 +1,10 @@
+import { Dependency } from '../types.js';
 import { SingleConfigSchemaType } from './schema.js';
+
+function formatDep(dep: Dependency) {
+    if (typeof dep === "string") return dep;
+    return `${dep.name}${dep.url ? ` | ${dep.url}` : ""}`
+}
 
 export function createHeader(config: SingleConfigSchemaType) {
     let meta = `/**
@@ -17,19 +23,19 @@ export function createHeader(config: SingleConfigSchemaType) {
     const libs = config.needsLibs ?? config.libs;
     if(libs) {
         for(let lib of libs) {
-            meta += `\n * @needsLib ${lib}`;
+            meta += `\n * @needsLib ${formatDep(lib)}`;
         }
     }
 
     if(config.optionalLibs) {
         for(let lib of config.optionalLibs) {
-            meta += `\n * @optionalLib ${lib}`;
+            meta += `\n * @optionalLib ${formatDep(lib)}`;
         }
     }
 
     if(config.needsPlugins) {
         for(let plugin of config.needsPlugins) {
-            meta += `\n * @needsPlugin ${plugin}`;
+            meta += `\n * @needsPlugin ${formatDep(plugin)}`;
         }
     }
 
